@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Aquarium secret amélioré</title>
+
+<style>
+body{
+  margin:0; height:100vh; background:#000; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family:Arial; overflow:hidden;
+}
+#message{
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  font-size:20px;
+}
+#aquarium{
+  display:none; width:85vw; height:65vh;
+  border:10px solid #0af; border-radius:25px;
+  background:linear-gradient(#8feaff,#0066aa);
+  position:relative; overflow:hidden;
+  animation:water 6s ease-in-out infinite;
+}
+
+/* Animation de l’eau */
+@keyframes water{
+  0%{background-position:0 0;}
+  50%{background-position:0 20px;}
+  100%{background-position:0 0;}
+}
+
+/* POISSONS AMÉLIORÉS */
+.fish{
+  position:absolute; width:90px; height:45px;
+  background:orange; border-radius:50px;
+  animation:swim 10s linear infinite;
+  box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+/* Queue animée */
+.fish::before{
+  content:""; position:absolute; right:-25px; top:12px;
+  width:0; height:0;
+  border-top:12px solid transparent;
+  border-bottom:12px solid transparent;
+  border-left:25px solid orange;
+  animation:tail 0.4s ease-in-out infinite;
+}
+
+@keyframes tail{
+  0%{transform:rotate(0deg);}
+  50%{transform:rotate(10deg);}
+  100%{transform:rotate(0deg);}
+}
+
+/* Œil */
+.fish::after{
+  content:""; position:absolute; left:15px; top:14px;
+  width:10px; height:10px; background:#fff; border-radius:50%;
+  box-shadow:3px 0 0 #000;
+}
+
+/* Couleurs variées */
+.fish.blue{background:#4da6ff;}
+.fish.red{background:#ff5c5c;}
+.fish.yellow{background:#ffe066;}
+
+/* AXOLOTL AMÉLIORÉ */
+.axolotl{
+  position:absolute; width:110px; height:55px;
+  background:#ffd6e7; border-radius:60px;
+  animation:swim 14s linear infinite;
+  box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+/* Branchies animées */
+.axolotl::before, .axolotl::after{
+  content:""; position:absolute; top:-10px;
+  width:6px; height:25px; background:#ff8fb0;
+  border-radius:10px;
+  animation:gills 1s ease-in-out infinite;
+}
+
+.axolotl::before{
+  left:15px; box-shadow:12px 0 #ff8fb0, 24px 0 #ff8fb0;
+}
+.axolotl::after{
+  right:15px; box-shadow:-12px 0 #ff8fb0, -24px 0 #ff8fb0;
+}
+
+@keyframes gills{
+  0%{transform:scaleY(1);}
+  50%{transform:scaleY(1.3);}
+  100%{transform:scaleY(1);}
+}
+
+/* Animation de nage */
+@keyframes swim{
+  0%{transform:translateX(-120px);}
+  50%{transform:translateX(80vw);}
+  100%{transform:translateX(-120px);}
+}
+</style>
+</head>
+
+<body>
+<div id="message">Tape le code secret pour révéler l’aquarium…</div>
+
+<div id="aquarium">
+  <!-- Poissons améliorés -->
+  <div class="fish blue" style="top:15%; animation-delay:0s;"></div>
+  <div class="fish red" style="top:40%; animation-delay:2s;"></div>
+  <div class="fish yellow" style="top:65%; animation-delay:4s;"></div>
+
+  <!-- Axolotl amélioré -->
+  <div class="axolotl" style="top:50%; left:10%; animation-delay:1s;"></div>
+</div>
+
+<script>
+const SECRET_CODE = "Bloblebleu"; // nouveau code secret
+let buffer = "";
+
+document.addEventListener("keydown", (e) => {
+  buffer += e.key.toLowerCase();
+  if(buffer.length > SECRET_CODE.length){
+    buffer = buffer.slice(-SECRET_CODE.length);
+  }
+  if(buffer === SECRET_CODE.toLowerCase()){
+    revealAquarium();
+  }
+});
+
+function revealAquarium(){
+  document.body.style.background = "#ffffff";
+  document.body.style.color = "#000000";
+  document.getElementById("message").textContent =
+    "Bienvenue dans l’aquarium amélioré 🐟🦎";
+  document.getElementById("aquarium").style.display = "block";
+}
+</script>
+
+</body>
+</html>

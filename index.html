@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Aquarium ultra complet</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  margin:0;
+  overflow:hidden;
+  background:#000;
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+
+/* PAGE NOIRE : TIMER + INDICE */
+#timer-box{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  font-size:32px;
+  color:white;
+  text-align:center;
+  z-index:9999;
+}
+
+#hint-btn{
+  display:none;
+  position:absolute;
+  top:60%;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 20px;
+  font-size:20px;
+  background:#1b4f99;
+  color:white;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(0,0,0,0.6);
+  z-index:9999;
+}
+
+#hint-text{
+  display:none;
+  position:absolute;
+  top:70%;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:22px;
+  color:white;
+  z-index:9999;
+}
+
+/* Message */
+#message{
+  position:absolute;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:20px;
+  z-index:20;
+}
+
+/* Aquarium fullscreen */
+#aquarium{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 15%, #5ee6ff, #00324f);
+  overflow:hidden;
+  display:none; /* IMPORTANT : caché au début */
+}
+
+/* Modes (background + ambiance) */
+body.mode-normal #aquarium{
+  background:radial-gradient(circle at 50% 15%, #5ee6ff, #00324f);
+}
+body.mode-night #aquarium{
+  background:radial-gradient(circle at 50% 10%, #4b3b8f, #050019);
+}
+body.mode-storm #aquarium{
+  background:radial-gradient(circle at 50% 20%, #1b3b4f, #000000);
+}
+
+/* Water overlay */
+.water-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,0.05);
+  mix-blend-mode:screen;
+  animation:waterMove 6s ease-in-out infinite;
+}
+@keyframes waterMove{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(25px);}
+  100%{transform:translateY(0);}
+}
+
+/* Light beams */
+.light-beam{
+  position:absolute;
+  top:-20%;
+  width:20%;
+  height:140%;
+  background:linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
+  filter:blur(4px);
+  opacity:0.6;
+  animation:beamMove 10s ease-in-out infinite;
+}
+.light-beam:nth-child(1){left:10%;}
+.light-beam:nth-child(2){left:40%;animation-delay:2s;}
+.light-beam:nth-child(3){left:70%;animation-delay:4s;}
+@keyframes beamMove{
+  0%{transform:translateX(0);}
+  50%{transform:translateX(20px);}
+  100%{transform:translateX(0);}
+}
+
+/* Sand floor */
+.sand{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:18%;
+  background:radial-gradient(circle at 50% 0, #f5e0a8, #c9a86a);
+}
+
+/* Rocks */
+.rock{
+  position:absolute;
+  bottom:12%;
+  width:80px;
+  height:40px;
+  background:radial-gradient(circle at 30% 30%, #777, #333);
+  border-radius:50px;
+}
+.rock.small{
+  width:50px;
+  height:25px;
+}
+
+/* Cave */
+.cave{
+  position:absolute;
+  bottom:12%;
+  left:35%;
+  width:140px;
+  height:80px;
+  background:radial-gradient(circle at 30% 20%, #555, #222);
+  border-radius:80px;
+  box-shadow:0 0 20px rgba(0,0,0,0.7);
+}
+.cave::before{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:20px;
+  width:70px;
+  height:40px;
+  background:#000;
+  border-radius:40px 40px 0 0;
+}
+
+/* Filter */
+.filter{
+  position:absolute;
+  top:10%;
+  right:8%;
+  width:40px;
+  height:90px;
+  background:linear-gradient(#444,#222);
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,0.7);
+}
+.filter::after{
+  content:"";
+  position:absolute;
+  bottom:-40px;
+  left:50%;
+  width:6px;
+  height:40px;
+  transform:translateX(-50%);
+  background:linear-gradient(to bottom, rgba(200,200,255,0.7), transparent);
+  animation:filterFlow 2s linear infinite;
+}
+@keyframes filterFlow{
+  0%{opacity:0;transform:translate(-50%,0);}
+  30%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,20px);}
+}
+
+/* Algae */
+.algae{
+  position:absolute;
+  bottom:18%;
+  width:22px;
+  height:160px;
+  background:linear-gradient(#0a4,#0f8);
+  border-radius:20px;
+  transform-origin:bottom center;
+  animation:algaeSway 3s ease-in-out infinite;
+}
+.algae.thin{
+  width:14px;
+  height:130px;
+}
+@keyframes algaeSway{
+  0%{transform:rotate(0deg);}
+  50%{transform:rotate(7deg);}
+  100%{transform:rotate(0deg);}
+}
+
+/* Bubbles */
+.bubble{
+  position:absolute;
+  bottom:-20px;
+  width:12px;
+  height:12px;
+  background:rgba(255,255,255,0.7);
+  border-radius:50%;
+  animation:bubbleRise 7s linear infinite;
+}
+.bubble.small{
+  width:8px;
+  height:8px;
+}
+@keyframes bubbleRise{
+  0%{transform:translateY(0) scale(1);opacity:1;}
+  100%{transform:translateY(-120vh) scale(0.3);opacity:0;}
+}
+
+/* Fish base */
+.fish{
+  position:absolute;
+  width:95px;
+  height:48px;
+  border-radius:50px;
+  box-shadow:0 0 15px rgba(0,0,0,0.5);
+  transform-origin:center;
+}
+
+/* Fish colors + gradient */
+.fish.blue{
+  background:linear-gradient(135deg,#4da6ff,#1b4f99);
+}
+.fish.orange{
+  background:linear-gradient(135deg,#ffb347,#ff7b00);
+}
+.fish.yellow{
+  background:linear-gradient(135deg,#ffe066,#ffcc33);
+}
+
+/* Fish details */
+.fish::after{
+  content:"";
+  position:absolute;
+  left:16px;
+  top:15px;
+  width:11px;
+  height:11px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow:3px 0 0 #000;
+}
+.fish::before{
+  content:"";
+  position:absolute;
+  right:-26px;
+  top:13px;
+  width:0;
+  height:0;
+  border-top:13px solid transparent;
+  border-bottom:13px solid transparent;
+  border-left:26px solid rgba(0,0,0,0.2);
+  animation:tailMove 0.4s ease-in-out infinite;
+}
+@keyframes tailMove{
+  0%{transform:rotate(0deg);}
+  50%{transform:rotate(12deg);}
+  100%{transform:rotate(0deg);}
+}
+
+/* Fish fins */
+.fish .fin-top,
+.fish .fin-bottom{
+  position:absolute;
+  width:26px;
+  height:14px;
+  background:rgba(255,255,255,0.4);
+  border-radius:20px;
+}
+.fish .fin-top{
+  top:4px;
+  left:30px;
+}
+.fish .fin-bottom{
+  bottom:4px;
+  left:30px;
+}
+
+/* Fish movements */
+@keyframes swimHorizontal{
+  0%{transform:translateX(-140px);}
+  50%{transform:translateX(100vw);}
+  100%{transform:translateX(-140px);}
+}
+@keyframes swimRandom{
+  0%{transform:translate(0,0);}
+  25%{transform:translate(25px,-12px);}
+  50%{transform:translate(-18px,18px);}
+  75%{transform:translate(12px,-8px);}
+  100%{transform:translate(0,0);}
+}
+@keyframes swimCircle{
+  0%{transform:rotate(0deg) translateX(45px) rotate(0deg);}
+  100%{transform:rotate(360deg) translateX(45px) rotate(-360deg);}
+}
+
+/* Axolotl */
+.axolotl{
+  position:absolute;
+  width:130px;
+  height:62px;
+  border-radius:70px;
+  box-shadow:0 0 18px rgba(0,0,0,0.6);
+}
+
+/* Axolotl colors */
+.axolotl.pink{
+  background:linear-gradient(135deg,#ffd6e7,#f7a9c9);
+}
+.axolotl.black{
+  background:linear-gradient(135deg,#444,#111);
+}
+
+/* Axolotl face */
+.axolotl .eye{
+  position:absolute;
+  top:22px;
+  width:10px;
+  height:10px;
+  background:#000;
+  border-radius:50%;
+}
+.axolotl .eye.left{left:32px;}
+.axolotl .eye.right{left:52px;}
+.axolotl .mouth{
+  position:absolute;
+  top:34px;
+  left:38px;
+  width:24px;
+  height:10px;
+  border-radius:0 0 20px 20px;
+  border-bottom:2px solid rgba(0,0,0,0.7);
+}
+
+/* Axolotl gills */
+.axolotl::before,
+.axolotl::after{
+  content:"";
+  position:absolute;
+  top:-12px;
+  width:7px;
+  height:28px;
+  background:#ff8fb0;
+  border-radius:10px;
+  animation:gillsMove 1s ease-in-out infinite;
+}
+.axolotl::before{
+  left:18px;
+  box-shadow:14px 0 #ff8fb0, 28px 0 #ff8fb0;
+}
+.axolotl::after{
+  right:18px;
+  box-shadow:-14px 0 #ff8fb0, -28px 0 #ff8fb0;
+}
+@keyframes gillsMove{
+  0%{transform:scaleY(1);}
+  50%{transform:scaleY(1.3);}
+  100%{transform:scaleY(1);}
+}
+
+/* Axolotl walking (rose) */
+@keyframes axWalk{
+  0%{transform:translateX(0);}
+  50%{transform:translateX(45vw);}
+  100%{transform:translateX(0);}
+}
+
+/* Axolotl swimming (noir) */
+@keyframes axSwim{
+  0%{transform:translateX(-150px) translateY(-20px);}
+  50%{transform:translateX(100vw) translateY(20px);}
+  100%{transform:translateX(-150px) translateY(-20px);}
+}
+
+/* Crabe */
+.crab{
+  position:absolute;
+  width:70px;
+  height:40px;
+  background:linear-gradient(135deg,#ff6b6b,#c0392b);
+  border-radius:40px;
+  box-shadow:0 0 12px rgba(0,0,0,0.6);
+}
+.crab::before,
+.crab::after{
+  content:"";
+  position:absolute;
+  top:-8px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:3px solid #ffb3b3;
+}
+.crab::before{left:-4px;}
+.crab::after{right:-4px;}
+.crab .leg{
+  position:absolute;
+  bottom:-6px;
+  width:12px;
+  height:10px;
+  background:#c0392b;
+  border-radius:10px;
+}
+.crab .leg.l1{left:8px;}
+.crab .leg.l2{left:22px;}
+.crab .leg.l3{left:36px;}
+.crab .leg.l4{left:50px;}
+@keyframes crabWalk{
+  0%{transform:translateX(0);}
+  50%{transform:translateX(25vw);}
+  100%{transform:translateX(0);}
+}
+
+/* Storm effect (waves) */
+.storm-wave{
+  position:absolute;
+  top:0;
+  width:120%;
+  height:40%;
+  background:radial-gradient(circle at 50% 0, rgba(255,255,255,0.15), transparent);
+  opacity:0;
+  pointer-events:none;
+}
+body.mode-storm .storm-wave{
+  animation:stormMove 3s linear infinite;
+  opacity:0.7;
+}
+@keyframes stormMove{
+  0%{transform:translateX(-10%) translateY(0);}
+  50%{transform:translateX(10%) translateY(10px);}
+  100%{transform:translateX(-10%) translateY(0);}
+}
+
+/* Night stars */
+.night-stars{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+}
+.night-stars span{
+  position:absolute;
+  width:3px;
+  height:3px;
+  background:#fff;
+  border-radius:50%;
+  opacity:0.8;
+}
+body.mode-night .night-stars{
+  opacity:0.7;
+}
+
+/* Buttons on the right */
+#controls{
+  position:absolute;
+  top:50%;
+  right:20px;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:30;
+}
+#controls button{
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  background:#1b4f99;
+  color:#fff;
+  cursor:pointer;
+  font-size:14px;
+  box-shadow:0 0 8px rgba(0,0,0,0.6);
+  transition:background 0.2s, transform 0.1s;
+}
+#controls button:hover{
+  background:#2f7ae0;
+  transform:translateY(-2px);
+}
+#controls button.active{
+  background:#ffb347;
+  color:#000;
+}
+
+/* Mode-specific behavior tweaks */
+body.mode-night .fish{
+  filter:brightness(0.8);
+}
+body.mode-night .axolotl.pink{
+  filter:brightness(1.1);
+}
+body.mode-storm .fish{
+  animation-duration:8s;
+}
+body.mode-storm .axolotl.black{
+  animation-duration:14s;
+}
+</style>
+</head>
+
+<body class="mode-normal">
+
+<!-- TIMER + INDICE -->
+<div id="timer-box">Chargement... 60</div>
+<button id="hint-btn">Indice</button>
+<div id="hint-text">Valorant, Fortnite, bleu</div>
+
+<div id="message">Bienvenue dans ton aquarium ultra complet 🐟🦎 — utilise les boutons à droite.</div>
+
+<div id="aquarium">
+  <!-- Light beams -->
+  <div class="light-beam"></div>
+  <div class="light-beam"></div>
+  <div class="light-beam"></div>
+
+  <!-- Water overlay -->
+  <div class="water-overlay"></div>
+
+  <!-- Storm wave -->
+  <div class="storm-wave"></div>
+
+  <!-- Night stars -->
+  <div class="night-stars">
+    <span style="top:10%;left:20%;"></span>
+    <span style="top:15%;left:60%;"></span>
+    <span style="top:25%;left:40%;"></span>
+    <span style="top:8%;left:80%;"></span>
+    <span style="top:30%;left:10%;"></span>
+  </div>
+
+  <!-- Sand -->
+  <div class="sand"></div>
+
+  <!-- Rocks -->
+  <div class="rock" style="left:15%;"></div>
+  <div class="rock small" style="left:22%;"></div>
+  <div class="rock small" style="left:70%;"></div>
+
+  <!-- Cave -->
+  <div class="cave"></div>
+
+  <!-- Filter -->
+  <div class="filter"></div>
+
+  <!-- Algae -->
+  <div class="algae" style="left:12%;"></div>
+  <div class="algae thin" style="left:20%;"></div>
+  <div class="algae" style="left:78%;"></div>
+  <div class="algae thin"
+// TIMER DE 60 SECONDES + BOUTON INDICE
+let timeLeft = 60;
+const timerBox = document.getElementById("timer-box");
+const hintBtn = document.getElementById("hint-btn");
+const hintText = document.getElementById("hint-text");
+
+const timerInterval = setInterval(() => {
+  timeLeft--;
+  timerBox.textContent = "Chargement... " + timeLeft;
+
+  if(timeLeft <= 0){
+    clearInterval(timerInterval);
+    timerBox.textContent = "Temps écoulé !";
+    hintBtn.style.display = "block";
+  }
+}, 1000);
+
+hintBtn.addEventListener("click", () => {
+  hintText.style.display = "block";
+});

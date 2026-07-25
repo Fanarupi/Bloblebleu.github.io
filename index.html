@@ -2,247 +2,109 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Aquarium animé</title>
+<title>Aquarium ultra complet</title>
 
 <style>
-/* --- GLOBAL --- */
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #000;
-  font-family: Arial;
-  color: white;
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  margin:0;
+  overflow:hidden;
+  background:#000;
+  font-family:Arial, sans-serif;
+  color:#fff;
 }
 
-#message {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 22px;
-  z-index: 10;
+/* Message */
+#message{
+  position:absolute;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:20px;
+  z-index:20;
 }
 
-/* --- AQUARIUM FULLSCREEN --- */
-#aquarium {
-  display: none;
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(circle at 50% 20%, #4dd9ff, #003d66);
-  overflow: hidden;
+/* Aquarium fullscreen */
+#aquarium{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 15%, #5ee6ff, #00324f);
+  overflow:hidden;
 }
 
-/* --- WATER MOVEMENT --- */
-#aquarium::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.05);
-  animation: water 6s ease-in-out infinite;
+/* Modes (background + ambiance) */
+body.mode-normal #aquarium{
+  background:radial-gradient(circle at 50% 15%, #5ee6ff, #00324f);
 }
-@keyframes water {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(20px); }
-  100% { transform: translateY(0); }
+body.mode-night #aquarium{
+  background:radial-gradient(circle at 50% 10%, #4b3b8f, #050019);
+}
+body.mode-storm #aquarium{
+  background:radial-gradient(circle at 50% 20%, #1b3b4f, #000000);
 }
 
-/* --- BUBBLES --- */
-.bubble {
-  position: absolute;
-  bottom: -20px;
-  width: 12px;
-  height: 12px;
-  background: rgba(255,255,255,0.6);
-  border-radius: 50%;
-  animation: rise 6s linear infinite;
+/* Water overlay */
+.water-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,0.05);
+  mix-blend-mode:screen;
+  animation:waterMove 6s ease-in-out infinite;
 }
-@keyframes rise {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  100% { transform: translateY(-120vh) scale(0.3); opacity: 0; }
-}
-
-/* --- ALGAE --- */
-.algae {
-  position: absolute;
-  bottom: 0;
-  width: 20px;
-  height: 200px;
-  background: linear-gradient(#0a4, #0f8);
-  border-radius: 20px;
-  animation: sway 3s ease-in-out infinite;
-}
-@keyframes sway {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(6deg); }
-  100% { transform: rotate(0deg); }
+@keyframes waterMove{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(25px);}
+  100%{transform:translateY(0);}
 }
 
-/* --- FISH BASE --- */
-.fish {
-  position: absolute;
-  width: 90px;
-  height: 45px;
-  border-radius: 50px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+/* Light beams */
+.light-beam{
+  position:absolute;
+  top:-20%;
+  width:20%;
+  height:140%;
+  background:linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
+  filter:blur(4px);
+  opacity:0.6;
+  animation:beamMove 10s ease-in-out infinite;
+}
+.light-beam:nth-child(1){left:10%;}
+.light-beam:nth-child(2){left:40%;animation-delay:2s;}
+.light-beam:nth-child(3){left:70%;animation-delay:4s;}
+@keyframes beamMove{
+  0%{transform:translateX(0);}
+  50%{transform:translateX(20px);}
+  100%{transform:translateX(0);}
 }
 
-/* --- FISH COLORS --- */
-.fish.blue { background: #4da6ff; }
-.fish.orange { background: #ff9c3d; }
-
-/* --- FISH DETAILS --- */
-.fish::after {
-  content: "";
-  position: absolute;
-  left: 15px;
-  top: 14px;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 3px 0 0 #000;
-}
-.fish::before {
-  content: "";
-  position: absolute;
-  right: -25px;
-  top: 12px;
-  width: 0;
-  height: 0;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-  border-left: 25px solid currentColor;
-  animation: tail 0.4s ease-in-out infinite;
-}
-@keyframes tail {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(10deg); }
-  100% { transform: rotate(0deg); }
+/* Sand floor */
+.sand{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:18%;
+  background:radial-gradient(circle at 50% 0, #f5e0a8, #c9a86a);
 }
 
-/* --- FISH MOVEMENTS --- */
-@keyframes swim {
-  0% { transform: translateX(-150px); }
-  50% { transform: translateX(100vw); }
-  100% { transform: translateX(-150px); }
+/* Rocks */
+.rock{
+  position:absolute;
+  bottom:12%;
+  width:80px;
+  height:40px;
+  background:radial-gradient(circle at 30% 30%, #777, #333);
+  border-radius:50px;
 }
-@keyframes randomMove {
-  0% { transform: translate(0,0); }
-  25% { transform: translate(20px,-10px); }
-  50% { transform: translate(-15px,15px); }
-  75% { transform: translate(10px,-5px); }
-  100% { transform: translate(0,0); }
-}
-@keyframes circle {
-  0% { transform: rotate(0deg) translateX(40px) rotate(0deg); }
-  100% { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+.rock.small{
+  width:50px;
+  height:25px;
 }
 
-/* --- AXOLOTL --- */
-.axolotl {
-  position: absolute;
-  width: 120px;
-  height: 60px;
-  border-radius: 60px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
-}
-
-/* Pink axolotl */
-.axolotl.pink { background: #ffd6e7; }
-
-/* Black axolotl */
-.axolotl.black { background: #333; }
-
-/* Axolotl gills */
-.axolotl::before, .axolotl::after {
-  content: "";
-  position: absolute;
-  top: -10px;
-  width: 6px;
-  height: 25px;
-  background: #ff8fb0;
-  border-radius: 10px;
-  animation: gills 1s ease-in-out infinite;
-}
-.axolotl::before {
-  left: 15px;
-  box-shadow: 12px 0 #ff8fb0, 24px 0 #ff8fb0;
-}
-.axolotl::after {
-  right: 15px;
-  box-shadow: -12px 0 #ff8fb0, -24px 0 #ff8fb0;
-}
-@keyframes gills {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(1.3); }
-  100% { transform: scaleY(1); }
-}
-
-/* Axolotl walking */
-@keyframes walk {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(40vw); }
-  100% { transform: translateX(0); }
-}
-
-/* Axolotl swimming */
-@keyframes swimSlow {
-  0% { transform: translateX(-150px) translateY(-20px); }
-  50% { transform: translateX(100vw) translateY(20px); }
-  100% { transform: translateX(-150px) translateY(-20px); }
-}
-</style>
-</head>
-
-<body>
-
-<div id="message">Tape le code secret pour révéler l’aquarium…</div>
-
-<div id="aquarium">
-
-  <!-- ALGAE -->
-  <div class="algae" style="left:10%;"></div>
-  <div class="algae" style="left:20%;"></div>
-  <div class="algae" style="left:80%;"></div>
-
-  <!-- BUBBLES -->
-  <div class="bubble" style="left:30%; animation-delay:0s;"></div>
-  <div class="bubble" style="left:50%; animation-delay:2s;"></div>
-  <div class="bubble" style="left:70%; animation-delay:4s;"></div>
-
-  <!-- FISH -->
-  <div class="fish blue" style="top:20%; animation:swim 10s linear infinite;"></div>
-  <div class="fish orange" style="top:40%; animation:randomMove 4s infinite;"></div>
-  <div class="fish blue" style="top:60%; animation:circle 6s linear infinite;"></div>
-
-  <!-- AXOLOTLS -->
-  <div class="axolotl pink" style="bottom:10%; left:5%; animation:walk 12s linear infinite;"></div>
-  <div class="axolotl black" style="top:30%; animation:swimSlow 18s linear infinite;"></div>
-
-</div>
-
-<script>
-const SECRET_CODE = "bloblebleu";
-let buffer = "";
-
-document.addEventListener("keydown", (e) => {
-  buffer += e.key.toLowerCase();
-  if (buffer.length > SECRET_CODE.length) {
-    buffer = buffer.slice(-SECRET_CODE.length);
-  }
-  if (buffer === SECRET_CODE) {
-    revealAquarium();
-  }
-});
-
-function revealAquarium() {
-  document.getElementById("message").textContent =
-    "Bienvenue dans ton aquarium animé 🐟🦎";
-  document.getElementById("aquarium").style.display = "block";
-}
-</script>
-
-</body>
-</html>
+/* Cave */
+.cave{
+  position:absolute;
+  bottom:12%;
+  left:35%;
+  width:140px;
+  height:80px;
+  background
